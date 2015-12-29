@@ -1,0 +1,14 @@
+*.sdf
+*.suo
+*.opensdf
+*.bat
+/CVS/
+/*/CVS/
+/Obj/
+/*/Obj/
+/Debug/
+/*/Debug/
+/Release/
+/*/Release/
+/x64/
+/*/x64/

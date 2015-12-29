@@ -1,4 +1,4 @@
-<CENTER><H1>Distributed Gradient-Domain Processing of Planar and Spherical Images (Version 4.5)</H1></CENTER>
+<CENTER><H1>Distributed Gradient-Domain Processing of Planar and Spherical Images</H1></CENTER>
 <CENTER>
 <A HREF="#LINKS">links</A>
 <A HREF="#DESCRIPTION">description</A>

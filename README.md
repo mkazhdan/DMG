@@ -95,7 +95,7 @@ The code also requires installation of the <i>zlib</i>, <i>png</i>, <i>tiff</i>,
 <DT>[<B>--tileWidth</B> &#60;<i>iGrid tile width</i>&#62;]
 <DT>[<B>--tileHeight</B> &#60;<i>iGrid tile height</i>&#62;]
 <DT>[<B>--tileExt</B> &#60;<i>iGrid tile extnsion</i>&#62;]
-<DD> When outputting to a tiled grid of images in <A HREF="iGrid.html">iGrid</A> format, these parameters specify the width, height, and file-type for the output tiles. The default resolution for the output tiles is 8192x8192 and the default file type is JPG.
+<DD> When outputting to a tiled grid of images in <A HREF="http://htmlpreview.github.io/?https://github.com/mkazhdan/DMG/blob/master/iGrid.html">iGrid</A> format, these parameters specify the width, height, and file-type for the output tiles. The default resolution for the output tiles is 8192x8192 and the default file type is JPG.
 
 <DT>[<B>--iWeight</B> &#60;<i>pixel fidelity term</i>&#62;]
 <DD> If the system is solving the Poisson equation to perform image smoothing or sharpening, this value specifies the fidelity term &alpha;.
@@ -112,10 +112,10 @@ The code also requires installation of the <i>zlib</i>, <i>png</i>, <i>tiff</i>,
 <DL>
 
 <DT><b>--pixels</b> &#60;<i>input composite/high-frequency image</i>&#62;
-<DD> This string is the the name of the image file containing the image band that this client is responsible for. (Currently supported file-types include PNG, JPEG, BMP, WDP, TIFF, and our tiled image format <A HREF="iGrid.html">iGrid</A>.) The image height is unconstrained (though it must be the same across all clients). However, the width for all but the last band should be a multiple of a nice-power of two. (Roughly, the power should be equal to the number of levels over which the solver is parallelized.)
+<DD> This string is the the name of the image file containing the image band that this client is responsible for. (Currently supported file-types include PNG, JPEG, BMP, WDP, TIFF, and our tiled image format <A HREF="http://htmlpreview.github.io/?https://github.com/mkazhdan/DMG/blob/master/iGrid.html">iGrid</A>.) The image height is unconstrained (though it must be the same across all clients). However, the width for all but the last band should be a multiple of a nice-power of two. (Roughly, the power should be equal to the number of levels over which the solver is parallelized.)
 
 <DT><b>--lowPixels</b> &#60;<i>input low-frequency image</i>&#62;
-<DD> This string is the the name of the image file containing the low-frequency image band that this client is responsible for. (Currently supported file-types include PNG, JPEG, BMP, WDP, TIFF, and our tiled image format <A HREF="iGrid.html">iGrid</A>.) The image height is unconstrained (though it must be the same across all clients). However, the width for all but the last band should be a multiple of a nice-power of two. (Roughly, the power should be equal to the number of levels over which the solver is parallelized.) If this file is not specified, the argument to <b>--pixels</B> is used for both low- and high-frequency content.
+<DD> This string is the the name of the image file containing the low-frequency image band that this client is responsible for. (Currently supported file-types include PNG, JPEG, BMP, WDP, TIFF, and our tiled image format <A HREF="http://htmlpreview.github.io/?https://github.com/mkazhdan/DMG/blob/master/iGrid.html">iGrid</A>.) The image height is unconstrained (though it must be the same across all clients). However, the width for all but the last band should be a multiple of a nice-power of two. (Roughly, the power should be equal to the number of levels over which the solver is parallelized.) If this file is not specified, the argument to <b>--pixels</B> is used for both low- and high-frequency content.
 
 
 <DT><b>--labels</b> &#60;<i>input mask image</i>&#62;
@@ -195,7 +195,7 @@ The resulting, stitched, image bands are:<BR>
 <TH> Process 1 Output
 </TR>
 </TABLE>
-Alternatively, if we just want to run on a single machine, we set up the server to expect a single connection, and use the <A href="iGrid.html">iGrid</A> format to merge the data:
+Alternatively, if we just want to run on a single machine, we set up the server to expect a single connection, and use the <A href="http://htmlpreview.github.io/?https://github.com/mkazhdan/DMG/blob/master/iGrid.html">iGrid</A> format to merge the data:
 <BLOCKQUOTE><CODE>
 ServerSocket.exe --count 1 --port 12345<br>
 ClientSocket.exe --pixels pixels.iGrid --labels labels.iGrid --out out.jpeg --address 127.0.0.1 --port 12345 --threads 3 --inCore

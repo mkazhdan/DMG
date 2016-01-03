@@ -1,0 +1,26 @@
+<html>
+<head>
+<title>iGrid</title>
+</head>
+<body>
+<CENTER><H1>The image-grid file format (iGrid)</H1></CENTER>
+</CENTER>
+<HR>
+To support the input/output of large files, we have introduced an image-grid file format. A file with the <I>.iGrid</I> file extension will be assumed to consist of <I>C</I>x<I>R</I> images layed out in a regular grid. The individual images can be any file format, and the only restrictions are that all images in the same row must have the same height, and all images in the same column must have the same width.
+<P>
+The syntax for the file is as follows.
+<BLOCKQUOTE><CODE>
+Columns: <i>C</i><br>
+Rows: <i>R</i><br>
+&lt;image in column 1, row 1&gt;<br>
+&lt;image in column 2, row 1&gt;<br>
+...<br>
+&lt;image in column <I>C</I>-1, row 1&gt;<br>
+&lt;image in column 1, row 2&gt;<br>
+...<br>
+&lt;image in column <I>C</I>, row <I>R</I>&gt;<br>
+</CODE></BLOCKQUOTE>
+<HR>
+<A HREF="http://www.cs.jhu.edu/~misha/Code/DMG">Back to Code</A>
+</body>
+</html>

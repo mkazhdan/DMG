@@ -25,14 +25,12 @@ typedef uint16_t LType;
 cmdLineInt Port( "port" , 0 );
 cmdLineString Address( "address" , "127.0.0.1" ) , Prefix( "prefix" ) , TempDir( "temp" , "." );
 cmdLineString Storage( "storage" );
-cmdLineReadable HDR( "hdr" );
 cmdLineString LowPixels( "lowPixels" ) , Pixels( "pixels" ) , Labels( "labels" ) , Out( "out" ) , OutGuess( "outGuess" );
 cmdLineInt Threads( "threads" , 1 ) , IOThreads( "ioThreads" , 1 );
 cmdLineReadable InCore( "inCore" );
 cmdLineInt Index( "index" , 0 );
 cmdLineReadable* params[] =
 {
-	&HDR ,
 	&LowPixels , &Pixels , &OutGuess , &Labels , &Out , &Port , &Address , &Prefix , &Index , &TempDir , &Storage , 
 	&Threads , &IOThreads , &InCore ,
 };
@@ -103,7 +101,7 @@ int _Execute( SocketedSuperMultigridClient< StorageType , PixelType , LType >& c
 	DefaultOutputTileHeight = client.tileHeight( );
 	if( client.tileExtension() ) DefaultOutputTileExtension = client.tileExtension( );
 
-	out = GetWriteStream< PixelType , PixelChannels >( Out.value , w1 , h1 , client.gammaCorrection() , client.quality() , ioServerPtr , HDR.set , IOThreads.value );
+	out = GetWriteStream< PixelType , PixelChannels >( Out.value , w1 , h1 , client.gammaCorrection() , client.quality() , ioServerPtr , client.hdr() , IOThreads.value );
 
 	char tmpDir[1024];
 	{

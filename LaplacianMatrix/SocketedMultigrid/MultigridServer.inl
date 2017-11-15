@@ -558,7 +558,7 @@ static void SocketedMultigridServer< PixelChannels , LabelChannels , SyncType , 
 (
 	char* prefix , int port , int clientCount , int iters , int inCoreRes , int minMGRes , int vCycles , int minBandSize ,
 	int tileWidth , int tileHeight , const char* tileExt , 
-	bool gammaCorrection , int quality , int lanes , bool verbose , int periodicType ,
+	bool gammaCorrection , bool hdr , int quality , int lanes , bool verbose , int periodicType ,
 	double iWeight , bool lump , double gWeight , double gScale ,
 	bool removeAverageGradient , int unknownType , bool showProgress ,
 	bool noCG , bool shortSync
@@ -576,6 +576,7 @@ static void SocketedMultigridServer< PixelChannels , LabelChannels , SyncType , 
 	if( tileExt ) strcpy( globalData.tileExt , tileExt );
 	else globalData.tileExt[0] = 0;
 	globalData.gammaCorrection = gammaCorrection;
+	globalData.hdr = hdr;
 	globalData.quality = quality;
 	globalData.lanes = lanes;
 	globalData.verbose = verbose;
@@ -1078,7 +1079,7 @@ static void SocketedMultigridServer< PixelChannels , LabelChannels , SyncType , 
 		(
 		_address , listenSocket , subClientCount , _globalData.iters , _inCoreRes , _minMGRes , _globalData.vCycles , _minBandSize ,
 		_globalData.tileWidth , _globalData.tileHeight , _globalData.tileExt ,
-		_globalData.gammaCorrection , _globalData.quality , _globalData.lanes , _globalData.verbose , _globalData.periodicType , _globalData.iWeight , _globalData.lump , _globalData.gWeight , _globalData.gScale ,
+		_globalData.gammaCorrection , _globalData.hdr , _globalData.quality , _globalData.lanes , _globalData.verbose , _globalData.periodicType , _globalData.iWeight , _globalData.lump , _globalData.gWeight , _globalData.gScale ,
 		_removeAverageGradient , _globalData.unknownType , _globalData.showProgress ,
 		_noCG , _globalData.shortSync , clipDimensions )
 		) return false;
@@ -1141,7 +1142,7 @@ template< int PixelChannels , int LabelChannels , class SyncType >
 template< class LabelType >
 bool SocketedMultigridServer< PixelChannels , LabelChannels , SyncType >::SetUp( char* address , int port , int clientCount , int iters , int inCoreRes , int minMGRes , int vCycles, int minBandSize ,
 											   int tileWidth , int tileHeight , const char* tileExt , 
-											   bool gammaCorrection , int quality , int lanes , bool verbose , int periodicType , double iWeight , bool lump , double gWeight , double gScale ,
+											   bool gammaCorrection , bool hdr , int quality , int lanes , bool verbose , int periodicType , double iWeight , bool lump , double gWeight , double gScale ,
 											   bool removeAverageGradient , int unknownType , bool showProgress , bool noCG , bool shortSync , int* clipDimensions )
 {
 	// Create a listening Socket for connecting to server
@@ -1151,21 +1152,21 @@ bool SocketedMultigridServer< PixelChannels , LabelChannels , SyncType >::SetUp(
 	if( address )
 	{
 		printf( "Server Address: %s:%d\n", address , port ) , fflush( stdout );
-		return SetUp( address , listenSocket , clientCount , iters , inCoreRes , minMGRes , vCycles , minBandSize , tileWidth , tileHeight , tileExt , gammaCorrection , quality , lanes , verbose , periodicType , iWeight , lump , gWeight , gScale , removeAverageGradient , unknownType , showProgress , noCG , shortSync , clipDimensions );
+		return SetUp( address , listenSocket , clientCount , iters , inCoreRes , minMGRes , vCycles , minBandSize , tileWidth , tileHeight , tileExt , gammaCorrection , hdr , quality , lanes , verbose , periodicType , iWeight , lump , gWeight , gScale , removeAverageGradient , unknownType , showProgress , noCG , shortSync , clipDimensions );
 	}
 	else
 	{
 		char hostAddress[512];
 		GetHostAddress( hostAddress );
 		printf( "Host Address: %s:%d\n", hostAddress , port ) , fflush( stdout );
-		return SetUp( hostAddress , listenSocket , clientCount , iters , inCoreRes , minMGRes , vCycles , minBandSize , tileWidth , tileHeight , tileExt , gammaCorrection , quality , lanes , verbose , periodicType , iWeight , lump ,  gWeight , gScale , removeAverageGradient , unknownType , showProgress , noCG , shortSync , clipDimensions );
+		return SetUp( hostAddress , listenSocket , clientCount , iters , inCoreRes , minMGRes , vCycles , minBandSize , tileWidth , tileHeight , tileExt , gammaCorrection , hdr , quality , lanes , verbose , periodicType , iWeight , lump ,  gWeight , gScale , removeAverageGradient , unknownType , showProgress , noCG , shortSync , clipDimensions );
 	}
 }
 template< int PixelChannels , int LabelChannels , class SyncType >
 template< class LabelType >
 bool SocketedMultigridServer< PixelChannels , LabelChannels , SyncType >::SetUp( char* address , AcceptorSocket listenSocket , int clientCount , int iters , int inCoreRes , int minMGRes , int vCycles , int minBandSize ,
 														   int tileWidth , int tileHeight , const char* tileExt , 
-											   bool gammaCorrection , int quality , int lanes , bool verbose , int periodicType , double iWeight , bool lump , double gWeight , double gScale ,
+											   bool gammaCorrection , bool hdr , int quality , int lanes , bool verbose , int periodicType , double iWeight , bool lump , double gWeight , double gScale ,
 											   bool removeAverageGradient , int unknownType , bool showProgress , bool noCG , bool shortSync , int* clipDimensions )
 {
 	ClientSocket* clientSockets = new ClientSocket[clientCount];
@@ -1173,6 +1174,8 @@ bool SocketedMultigridServer< PixelChannels , LabelChannels , SyncType >::SetUp(
 	_inCoreRes	= inCoreRes;
 	_minMGRes	= minMGRes;
 
+	_globalData.gammaCorrection = gammaCorrection;
+	_globalData.hdr = hdr;
 	_globalData.periodicType= periodicType;
 	_globalData.verbose		= verbose;
 	_globalData.iters		= iters;
@@ -1901,7 +1904,7 @@ void SocketedMultigridServer< PixelChannels , LabelChannels , SyncType >::SolveI
 //////////////////////////////////
 bool SocketedSuperMultigridServer::SetUp( char* prefix , int port , int clientCount , int iters , int inCoreRes , int minMGRes , int vCycles , int minBandSize ,
 												    int tileWidth , int tileHeight , const char* tileExt , 
-												    bool gammaCorrection , int quality , int lanes , bool verbose , int periodicType ,
+												    bool gammaCorrection , bool hdr , int quality , int lanes , bool verbose , int periodicType ,
 													double iWeight , bool lump , double gWeight , double gScale ,
 													bool removeAverageGradient , int unknownType , bool showProgress ,
 												    bool noCG , bool shortSync )
@@ -1921,6 +1924,7 @@ bool SocketedSuperMultigridServer::SetUp( char* prefix , int port , int clientCo
 	if( tileExt ) strcpy( _globalData.tileExt , tileExt );
 	else _globalData.tileExt[0] = 0;
 	_globalData.gammaCorrection = gammaCorrection;
+	_globalData.hdr = hdr;
 	_globalData.quality = quality;
 	_globalData.lanes = lanes;
 	_globalData.verbose = verbose;
@@ -2053,7 +2057,7 @@ bool SocketedSuperMultigridServer::Run( void )
 		(
 		_address , listenSocket , subClientCount , _globalData.iters , _inCoreRes , _minMGRes , _globalData.vCycles , _minBandSize ,
 		_globalData.tileWidth , _globalData.tileHeight , _globalData.tileExt ,
-		_globalData.gammaCorrection , _globalData.quality , _globalData.lanes , _globalData.verbose , _globalData.periodicType , _globalData.iWeight , _globalData.lump , _globalData.gWeight , _globalData.gScale ,
+		_globalData.gammaCorrection , _globalData.hdr , _globalData.quality , _globalData.lanes , _globalData.verbose , _globalData.periodicType , _globalData.iWeight , _globalData.lump , _globalData.gWeight , _globalData.gScale ,
 		_removeAverageGradient , _globalData.unknownType , _globalData.showProgress ,
 		_noCG , _globalData.shortSync , clipDimensions )
 		) return false;

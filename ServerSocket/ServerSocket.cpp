@@ -16,7 +16,7 @@ typedef uint16_t LType;
 
 cmdLineInt Count("count") , Port( "port" , 0 ) , Iters( "iters" , 5 ) , InCoreRes( "inCoreRes" , 1024 ) , MinMGRes( "minMGRes" , 64 ) , VCycles( "vCycles" , 1 ) , Quality( "quality" , 100 ) , Lanes( "lanes" , 1 );
 cmdLineInt MinBandSize( "minBandSize" , 0 ) , TileWidth( "tileWidth" , 8192 ) , TileHeight( "tileHeight" , 8192 ) , UnknownType( "unknownType" , UNKNOWN_BLACK );
-cmdLineReadable Verbose("verbose") , Spherical( "spherical" ) , Cylindrical( "cylindrical" ) , Progress( "progress" ) , GammaCorrection( "gCorrection" );
+cmdLineReadable Verbose("verbose") , Spherical( "spherical" ) , Cylindrical( "cylindrical" ) , Progress( "progress" ) , GammaCorrection( "gCorrection" ) , HDR( "hdr" );
 cmdLineReadable NoConjugateGradient( "noCG" ) , Lump( "lump" );
 cmdLineReadable NoDisk( "noDisk" ) , NoNetwork( "noNetwork" ) , ShortSync( "shortSync" );
 cmdLineString Prefix( "prefix" ) , TileExtension( "tileExt" );
@@ -25,7 +25,7 @@ cmdLineReadable Deramp( "deramp" );
 cmdLineReadable GrayImage( "gray" );
 cmdLineReadable* params[]=
 {
-	&Port , &Count , &Iters , &InCoreRes , &MinMGRes , &VCycles , &Verbose , &Spherical , &Cylindrical , &Progress , &Quality , &Lanes , &NoConjugateGradient , &MinBandSize , &Prefix , &UnknownType , &GammaCorrection ,
+	&Port , &Count , &Iters , &InCoreRes , &MinMGRes , &VCycles , &Verbose , &Spherical , &Cylindrical , &Progress , &Quality , &Lanes , &NoConjugateGradient , &MinBandSize , &Prefix , &UnknownType , &GammaCorrection , &HDR ,
 	&IWeight , &GScale , &GWeight , &Lump ,
 	&NoDisk , &NoNetwork , &ShortSync , &TileWidth , &TileHeight , &TileExtension , &Deramp ,
 	&GrayImage ,
@@ -65,6 +65,7 @@ void ShowUsage( char* ex )
 	printf( "\t[--%s <gradient interpolation weight>=%f]\n" , GWeight.name , GWeight.value ) , fflush( stdout );
 	printf( "\t[--%s <gradient scale>=%f]\n" , GScale.name , GScale.value ) , fflush( stdout );
 	printf( "\t[--%s]\n" , GammaCorrection.name ) , fflush( stdout );
+	printf( "\t[--%s]\n" , HDR.name ) , fflush( stdout );
 	printf( "\t[--%s]\n" , Deramp.name ) , fflush( stdout );
 	printf( "\t[--%s]\n" , GrayImage.name ) , fflush( stdout );
 	printf( "\t[--%s]\n" , Lump.name ) , fflush( stdout );
@@ -80,20 +81,20 @@ int Execute( void )
 	if( ShortSync.set )
 		SocketedMultigridServer< PixelChannels , 3 , half  , LType > server
 		(
-			Prefix.value , Port.value , Count.value , Iters.value , InCoreRes.value , MinMGRes.value , VCycles.value , MinBandSize.value , TileWidth.value , TileHeight.value , TileExtension.set ? TileExtension.value : NULL , GammaCorrection.set , Quality.value , Lanes.value , Verbose.set , Spherical.set ? SPHERICAL_PERIODIC : (Cylindrical.set ? CYLINDRICAL_PERIODIC : NO_PERIODIC ) , IWeight.value , Lump.set , GWeight.value , GScale.value ,
+			Prefix.value , Port.value , Count.value , Iters.value , InCoreRes.value , MinMGRes.value , VCycles.value , MinBandSize.value , TileWidth.value , TileHeight.value , TileExtension.set ? TileExtension.value : NULL , GammaCorrection.set , HDR.set , Quality.value , Lanes.value , Verbose.set , Spherical.set ? SPHERICAL_PERIODIC : (Cylindrical.set ? CYLINDRICAL_PERIODIC : NO_PERIODIC ) , IWeight.value , Lump.set , GWeight.value , GScale.value ,
 			Deramp.set , UnknownType.value , Progress.set ,
 			NoConjugateGradient.set , ShortSync.set
 		);
 	else
 		SocketedMultigridServer< PixelChannels , 3 , float , LType > server
 		(
-			Prefix.value , Port.value , Count.value , Iters.value , InCoreRes.value , MinMGRes.value , VCycles.value , MinBandSize.value , TileWidth.value , TileHeight.value , TileExtension.set ? TileExtension.value : NULL , GammaCorrection.set , Quality.value , Lanes.value , Verbose.set , Spherical.set ? SPHERICAL_PERIODIC : (Cylindrical.set ? CYLINDRICAL_PERIODIC : NO_PERIODIC ) , IWeight.value , Lump.set , GWeight.value , GScale.value ,
+			Prefix.value , Port.value , Count.value , Iters.value , InCoreRes.value , MinMGRes.value , VCycles.value , MinBandSize.value , TileWidth.value , TileHeight.value , TileExtension.set ? TileExtension.value : NULL , GammaCorrection.set , HDR.set , Quality.value , Lanes.value , Verbose.set , Spherical.set ? SPHERICAL_PERIODIC : (Cylindrical.set ? CYLINDRICAL_PERIODIC : NO_PERIODIC ) , IWeight.value , Lump.set , GWeight.value , GScale.value ,
 			Deramp.set , UnknownType.value , Progress.set ,
 			NoConjugateGradient.set , ShortSync.set
 		);
 #else // !MISHA_CODE_CLEAN_UP
 	SocketedSuperMultigridServer server;
-	if( !server.SetUp( Prefix.value , Port.value , Count.value , Iters.value , InCoreRes.value , MinMGRes.value , VCycles.value , MinBandSize.value , TileWidth.value , TileHeight.value , TileExtension.set ? TileExtension.value : NULL , GammaCorrection.set , Quality.value , Lanes.value , Verbose.set , Spherical.set ? SPHERICAL_PERIODIC : (Cylindrical.set ? CYLINDRICAL_PERIODIC : NO_PERIODIC ) , IWeight.value , Lump.set , GWeight.value , GScale.value ,
+	if( !server.SetUp( Prefix.value , Port.value , Count.value , Iters.value , InCoreRes.value , MinMGRes.value , VCycles.value , MinBandSize.value , TileWidth.value , TileHeight.value , TileExtension.set ? TileExtension.value : NULL , GammaCorrection.set , HDR.set , Quality.value , Lanes.value , Verbose.set , Spherical.set ? SPHERICAL_PERIODIC : (Cylindrical.set ? CYLINDRICAL_PERIODIC : NO_PERIODIC ) , IWeight.value , Lump.set , GWeight.value , GScale.value ,
 		Deramp.set , UnknownType.value , Progress.set ,
 		NoConjugateGradient.set , ShortSync.set
 		) )

@@ -38,6 +38,8 @@ bool SocketedMultigridClient< PixelChannels , LabelChannels , StorageType , Sync
 template< int PixelChannels , int LabelChannels , class StorageType , class SyncType , class PixelType , class LabelType >
 bool SocketedMultigridClient< PixelChannels , LabelChannels , StorageType , SyncType , PixelType , LabelType >::gammaCorrection( void ) const { return _globalData.gammaCorrection; }
 template< int PixelChannels , int LabelChannels , class StorageType , class SyncType , class PixelType , class LabelType >
+bool SocketedMultigridClient< PixelChannels , LabelChannels , StorageType , SyncType , PixelType , LabelType >::hdr( void ) const { return _globalData.hdr; }
+template< int PixelChannels , int LabelChannels , class StorageType , class SyncType , class PixelType , class LabelType >
 int SocketedMultigridClient< PixelChannels , LabelChannels , StorageType , SyncType , PixelType , LabelType >::tileWidth( void ) const { return _globalData.tileWidth; }
 template< int PixelChannels , int LabelChannels , class StorageType , class SyncType , class PixelType , class LabelType >
 int SocketedMultigridClient< PixelChannels , LabelChannels , StorageType , SyncType , PixelType , LabelType >::tileHeight( void ) const { return _globalData.tileHeight; }
@@ -623,6 +625,8 @@ void SocketedSuperMultigridClient< StorageType , PixelType , LabelType >::_Run( 
 
 template< class StorageType , class PixelType , class LabelType >
 bool SocketedSuperMultigridClient< StorageType , PixelType , LabelType >::gammaCorrection( void ) const { return _globalData.gammaCorrection; }
+template< class StorageType , class PixelType , class LabelType >
+bool SocketedSuperMultigridClient< StorageType , PixelType , LabelType >::hdr( void ) const { return _globalData.hdr; }
 template< class StorageType , class PixelType , class LabelType >
 int SocketedSuperMultigridClient< StorageType , PixelType , LabelType >::tileWidth( void ) const { return _globalData.tileWidth; }
 template< class StorageType , class PixelType , class LabelType >

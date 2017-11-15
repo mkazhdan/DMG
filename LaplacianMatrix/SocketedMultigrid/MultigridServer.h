@@ -80,7 +80,7 @@ public:
 	(
 		char* prefix , int port , int clientCount , int iters , int inCoreRes , int minMGRes , int vCycles , int minBandSize ,
 		int tileWidth , int tileHeight , const char* tileExt ,
-		bool gammaCorrection , int quality , int lanes , bool verbose , int periodicType ,
+		bool gammaCorrection , bool hdr ,  int quality , int lanes , bool verbose , int periodicType ,
 		double iWeight , bool lump , double gWeight , double gScale ,
 		bool removeAverageGradient , int unknownType , bool showProgress ,
 		bool noCG , bool shortSync
@@ -112,14 +112,14 @@ public:
 	template< class LabelType >
 	bool SetUp( char* address , int port , int clientCount , int iters , int inCoreRes , int minMGRes , int vCycles , int minBandSize ,
 		int tileWidth , int tileHeight , const char* tileExt , 
-		bool gammaCorrection , int quality , int lanes , bool verbose , int periodicType , double iWeight , bool lump , double gWeight , double gScale ,
+		bool gammaCorrection , bool hdr , int quality , int lanes , bool verbose , int periodicType , double iWeight , bool lump , double gWeight , double gScale ,
 		bool removeAverageGradient , int unknownType , bool showProgress ,
 		bool noCG , bool shortSync , int* clipDimensions );
 
 	template< class LabelType >
 	bool SetUp( char* address , AcceptorSocket listenSocket , int clientCount , int iters , int inCoreRes , int minMGRes , int vCycles , int minBandSize ,
 		int tileWidth , int tileHeight , const char* tileExt , 
-		bool gammaCorrection , int quality , int lanes , bool verbose , int periodicType , double iWeight , bool lump , double gWeight , double gScale ,
+		bool gammaCorrection , bool hdr , int quality , int lanes , bool verbose , int periodicType , double iWeight , bool lump , double gWeight , double gScale ,
 		bool removeAverageGradient , int unknownType , bool showProgress ,
 		bool noCG , bool shortSync , int* clipDimensions );
 
@@ -138,7 +138,7 @@ public:
 	// Set the parameters of the sockected super server.
 	bool SetUp( char* prefix , int port , int clientCount , int iters , int inCoreRes , int minMGRes , int vCycles , int minBandSize ,
 		int tileWidth , int tileHeight , const char* tileExt ,
-		bool gammaCorrection , int quality , int lanes , bool verbose , int periodicType ,
+		bool gammaCorrection , bool hdr , int quality , int lanes , bool verbose , int periodicType ,
 		double iWeight , bool lump , double gWeight , double gScale ,
 		bool removeAverageGradient ,
 		int unknownType , bool showProgress ,

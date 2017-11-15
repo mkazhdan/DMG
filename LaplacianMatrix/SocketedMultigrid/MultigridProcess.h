@@ -32,6 +32,7 @@ public:
 	int cEnd	(void)	const;
 
 	bool gammaCorrection( void ) const;
+	bool hdr( void ) const;
 	int quality	(void)	const;
 	int iters	(void)	const;
 	int vCycles	(void)	const;
@@ -106,6 +107,7 @@ public:
 	int height	(void)	const;	// the height of the image/band
 	int cHeight	(void)	const;	// the clipped height of the image/band
 	bool gammaCorrection( void ) const;
+	bool hdr( void ) const;
 	int quality	(void)	const;
 	bool showProgress( void ) const;
 	int         tileWidth    ( void ) const;

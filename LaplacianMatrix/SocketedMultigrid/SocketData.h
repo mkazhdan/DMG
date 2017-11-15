@@ -8,7 +8,7 @@ class GlobalData
 {
 public:
 	int periodicType;
-	bool verbose , showProgress , shortSync , gammaCorrection , lump;
+	bool verbose , showProgress , shortSync , gammaCorrection , hdr , lump;
 	int iters , unknownType , vCycles , quality , lanes , width , height , cWidth , cHeight , tileWidth , tileHeight;
 	double iWeight , gWeight , gScale;
 	char tileExt[16];

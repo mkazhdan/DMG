@@ -373,8 +373,8 @@ public:
 	void advance( void );
 };
 inline void GetReadSize( char* fileName , int& width , int& height );
-template< class Real , int Channels >	StreamingGrid* GetReadStream ( char* fileName ,       int& width ,       int& height , bool gammaDecode ,                      MultiStreamIOServer* ioServer ,            int threads );
-template< class Real , int Channels >	StreamingGrid* GetWriteStream( char* fileName , const int& width , const int& height , bool gammaEncode , const int& quality , MultiStreamIOServer* ioServer , bool hdr , int threads );
+template< class Real , int Channels > StreamingGrid* GetReadStream ( char* fileName ,       int& width ,       int& height , bool gammaDecode ,                      MultiStreamIOServer* ioServer ,            int threads );
+template< class Real , int Channels > StreamingGrid* GetWriteStream( char* fileName , const int& width , const int& height , bool gammaEncode , const int& quality , MultiStreamIOServer* ioServer , bool hdr , int threads );
 
 #include "ImageStream.inl"
 #endif // GRID_STREAM_INCLUDED

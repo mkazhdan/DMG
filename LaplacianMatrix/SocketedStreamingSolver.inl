@@ -2340,94 +2340,167 @@ void SocketedMultiGridStreamingSolver< Channels , StorageType , SyncType >::UnSe
 template< int Channels , class StorageType , class SyncType >
 void SocketedMultiGridStreamingSolver< Channels , StorageType , SyncType >::SetRestriction( Pointer( float ) lB , int c , int idx , int sRestrict , int eRestrict )
 {
-	int highStart = FiniteElements1D<float,Type,Degree>::FullProlongationStencil::ProlongationStencil::Start(sRestrict);
-	int highEnd = FiniteElements1D<float,Type,Degree>::FullProlongationStencil::ProlongationStencil::Start(eRestrict)+FiniteElements1D<float,Type,Degree>::FullProlongationStencil::ProlongationStencil::Size;
+#ifdef FIX_RESTRICTION
+	if( _start%4 ) fprintf( stderr , "[ERROR] Expected start to be a multiple of four!\n" ) , exit( 0 );
+
+	auto HighStart128 = [&]( int idx )
+	{
+		return FiniteElements1D< float , Type , Degree >::FullProlongationStencil::ProlongationStencil::Start( idx ) / RealPerWord - _start128;
+	};
+	auto HighEnd128 = [&]( int idx )
+	{
+		return ( FiniteElements1D< float , Type , Degree >::FullProlongationStencil::ProlongationStencil::Start( idx ) + FiniteElements1D< float , Type , Degree >::FullProlongationStencil::ProlongationStencil::Size - 1 ) / RealPerWord - _start128;
+	};
+	int highStart128 = HighStart128( sRestrict );
+	int highEnd128 = HighEnd128( eRestrict-1 ) + 1;
+#else // !FIX_RESTRICTION
+	// The index of the first element in the higher resolution that can prolong to the range [sRestrict,eRestrict)
+	int highStart = FiniteElements1D< float , Type , Degree >::FullProlongationStencil::ProlongationStencil::Start( sRestrict );
+	int highEnd   = FiniteElements1D< float , Type , Degree >::FullProlongationStencil::ProlongationStencil::Start( eRestrict ) + FiniteElements1D< float , Type , Degree >::FullProlongationStencil::ProlongationStencil::Size;
 	int highStart128 = (highStart-(RealPerWord-1))/RealPerWord;
 	int highEnd128   = (highEnd  +(RealPerWord-1))/RealPerWord;
 	highStart128 -= _start128;
-	highEnd128 -= _start128;
+	highEnd128   -= _start128;
+#endif // FIX_RESTRICTION
 
+#ifdef FIX_RESTRICTION
+#else // !FIX_RESTRICTION
 	if( (idx>=Degree && idx<(minor>>1)-Degree) || periodicType==SPHERICAL_PERIODIC ) SetInteriorRestriction( lB , c , idx , sRestrict , eRestrict );
 	else
+#endif // FIX_RESTRICTION
 	{
-		int startY=FiniteElements1D<float,Type,Degree>::FullProlongationStencil::ProlongationStencil::Start(idx);
-		int jj;
-		if		(idx<Degree)				jj=idx;
-		else if	(idx>(minor>>1)-1-Degree)	jj=2*Degree+(idx-((minor>>1)-1));
-		else								jj=Degree;
+		int startY = FiniteElements1D< float , Type , Degree >::FullProlongationStencil::ProlongationStencil::Start( idx );
 
+		// Pointers to the rows that will be restricted
+		ALIGN( float scratch[4] , 16 );
+		float dotSum;
+		__m128 dSum;
+		int s , e;
+
+		// Compute the weighted average of the (four) rows using the minor restriction stencil stencil
+#ifdef FIX_RESTRICTION
+		if( (idx>=Degree && idx<(minor>>1)-Degree) || periodicType==SPHERICAL_PERIODIC )
 		{
-			ConstPointer( __m128 ) localRPtrs[FiniteElements1D<float,Type,Degree>::FullProlongationStencil::ProlongationStencil::Size];
-			for(int y=0;y<FiniteElements1D<float,Type,Degree>::FullProlongationStencil::ProlongationStencil::Size;y++)
-				if(startY+y>=0 && startY+y<minor)	localRPtrs[y] = ( Pointer( __m128 ) )SocketedStreamingSolver< Channels , SyncType >::GetRRow(startY+y,c);
-				else								localRPtrs[y] = NullPointer< __m128 >( );
-			ALIGN( float scratch[4] , 16 );
-			__m128 res[FiniteElements1D<float,Type,Degree>::FullProlongationStencil::ProlongationStencil::Size];
-			float dotSum;
-			__m128 dSum;
-			int s,e;
+			ConstPointer( __m128 ) localRPtrs[ FiniteElements1D< float , Type , Degree >::FullProlongationStencil::ProlongationStencil::Size ];
+			__m128 res[ FiniteElements1D< float , Type , Degree >::FullProlongationStencil::ProlongationStencil::Size ];
 
-			for(int d=0;d<FiniteElements1D<float,Type,Degree>::FullProlongationStencil::ProlongationStencil::Size;d++)
+			for( int y=0 ; y<FiniteElements1D< float , Type , Degree >::FullProlongationStencil::ProlongationStencil::Size ; y++ )
+				localRPtrs[y] = ( Pointer( __m128 ) )SocketedStreamingSolver< Channels , SyncType >::GetRRow( startY+y , c );
+
+			for( int d=0 ; d<FiniteElements1D< float , Type , Degree >::FullProlongationStencil::ProlongationStencil::Size ; d++ )
 			{
-				for(int j=0;j<4;j++)	scratch[j] = float( minorProlongationStencil.caseTable[jj].values[d] );
-				res[d]=_mm_load_ps(scratch);
+				for( int j=0 ; j<4 ; j++ ) scratch[j] = float( minorProlongationStencil.caseTable[Degree].values[d] );
+				res[d]=_mm_load_ps( scratch );
+			}
+
+			{
+				int d=0;
+				for( int i=highStart128 ; i<highEnd128 ; i++ ) localRAccum[i] = _mm_mul_ps( res[d] , _mm_add_ps( localRPtrs[d][i] , localRPtrs[Degree+1-d][i] ) );
+			}
+			for( int d=1 ; d<=(Degree>>1) ; d++ )
+				for( int i=highStart128 ; i<highEnd128 ; i++ ) localRAccum[i] = _mm_add_ps( localRAccum[i] , _mm_mul_ps( res[d] , _mm_add_ps( localRPtrs[d][i] , localRPtrs[Degree+1-d][i] ) ) );
+			if( Degree&1 )
+			{
+				int d = (Degree+1)>>1;
+				for( int i=highStart128 ; i<highEnd128 ; i++ ) localRAccum[i] = _mm_add_ps( localRAccum[i] , _mm_mul_ps( res[d] , localRPtrs[d][i] ) );
+			}
+		}
+		else
+#endif // !FIX_RESTRICTION
+		{
+			int jj;
+			if     ( idx<Degree )              jj=idx;
+			else if( idx>(minor>>1)-1-Degree ) jj=2*Degree+(idx-((minor>>1)-1));
+			else                               jj=Degree;
+
+			ConstPointer( __m128 ) localRPtrs[ FiniteElements1D< float , Type , Degree >::FullProlongationStencil::ProlongationStencil::Size ];
+			__m128 res[ FiniteElements1D< float , Type , Degree >::FullProlongationStencil::ProlongationStencil::Size ];
+
+
+			for( int y=0 ; y<FiniteElements1D< float , Type , Degree >::FullProlongationStencil::ProlongationStencil::Size ; y++ )
+				if( startY+y>=0 && startY+y<minor ) localRPtrs[y] = ( Pointer( __m128 ) )SocketedStreamingSolver< Channels , SyncType >::GetRRow( startY+y , c );
+				else                                localRPtrs[y] = NullPointer< __m128 >( );
+
+			for( int d=0 ; d<FiniteElements1D< float , Type , Degree >::FullProlongationStencil::ProlongationStencil::Size ; d++ )
+			{
+				for( int j=0 ; j<4 ; j++ ) scratch[j] = float( minorProlongationStencil.caseTable[jj].values[d] );
+				res[d] = _mm_load_ps( scratch );
 			}
 			memset( localRAccum+highStart128 , 0 , sizeof(__m128)*(highEnd128-highStart128 ) );
-			for(int d=0;d<FiniteElements1D<float,Type,Degree>::FullProlongationStencil::ProlongationStencil::Size;d++)
-				if(localRPtrs[d])
-					for(int i=highStart128;i<highEnd128;i++) localRAccum[i]=_mm_add_ps(localRAccum[i],_mm_mul_ps(res[d],localRPtrs[d][i]));
+			for( int d=0 ; d<FiniteElements1D< float , Type , Degree >::FullProlongationStencil::ProlongationStencil::Size ; d++ )
+				if( localRPtrs[d] )
+					for( int i=highStart128 ; i<highEnd128 ; i++ ) localRAccum[i] = _mm_add_ps( localRAccum[i] , _mm_mul_ps( res[d] , localRPtrs[d][i] ) );
+		}
 
-			// Offset 0
+		// Offset 0
+		{
+			// If there is no previous block, compute for the first block directly, and advance the starting index
+			if( sRestrict==0 && periodicType==NO_PERIODIC )
 			{
-				if( sRestrict==0 && periodicType==NO_PERIODIC )
-				{
-					dotSum=0;
-					lB[0] = RestrictionUpdate0( prolongationStencil[0].matrixValues[0] , localRAccum , dotSum , 0 );
-					s=2;
-				}
-				else
-				{
-					SetRestrictionDotSum(prolongationStencil[1].matrixValues[0],localRAccum,highStart128,dSum);
-					_mm_store_ps(scratch,dSum);
-					dotSum=scratch[3];
-					s=sRestrict-_start/2;
-				}
-
-				if( eRestrict==major/2 && periodicType==NO_PERIODIC )	e=(eRestrict-_start/2)-2;
-				else									e=(eRestrict-_start/2);
-
-				for(int i=s;i<e;i+=2)						lB[i]=RestrictionUpdate0(prolongationStencil[1].matrixValues[0],localRAccum,dotSum,i);
-				int i=(eRestrict-_start/2)-2;
-				if( eRestrict==major/2 && periodicType==NO_PERIODIC )	lB[i]=RestrictionUpdate0(prolongationStencil[2].matrixValues[0],localRAccum,dotSum,i);
+				dotSum = 0;
+				lB[0] = RestrictionUpdate0( prolongationStencil[0].matrixValues[0] , localRAccum , dotSum , 0 );
+				s = 2;
 			}
-			// Offset 1
+			// Otherwise, compute the contribution from the last element in the previous block
+			else
 			{
-				if( sRestrict==0 && periodicType==NO_PERIODIC )
-				{
-					SetRestrictionDotSum(prolongationStencil[0].matrixValues[1],localRAccum,0,dSum);
-					s=1;
-				}
-				else
-				{
-					SetRestrictionDotSum(prolongationStencil[1].matrixValues[1],localRAccum,highStart128+1,dSum);
-					s=(sRestrict-_start/2)+1;
-				}
-				_mm_store_ps(scratch,dSum);
-				dotSum=scratch[1]+scratch[2]+scratch[3];
-				if( eRestrict==major/2 && periodicType==NO_PERIODIC )	e=(eRestrict-_start/2)-4;
-				else									e=(eRestrict-_start/2);
-				for(int i=s;i<e;i+=2)	lB[i]=RestrictionUpdate1(prolongationStencil[1].matrixValues[1],localRAccum,dotSum,i);
-				if( eRestrict==major/2 && periodicType==NO_PERIODIC )
-				{
-					int i=(eRestrict-_start/2)-3;
-					lB[i]=RestrictionUpdate1(prolongationStencil[2].matrixValues[1],localRAccum,dotSum,i);
-					i+=2;
-					lB[i]=dotSum;
-				}
+#ifdef FIX_RESTRICTION
+				// Get the next even
+				int _sRestrict = (sRestrict&1) ? sRestrict+1 : sRestrict;
+				SetRestrictionDotSum( prolongationStencil[1].matrixValues[0] , localRAccum , HighStart128( _sRestrict ) , dSum );
+				_mm_store_ps( scratch , dSum );
+				dotSum = scratch[3];
+				s = _sRestrict - _start/2;
+#else // !FIX_RESTRICTION
+				SetRestrictionDotSum( prolongationStencil[1].matrixValues[0] , localRAccum , highStart128 , dSum );
+				_mm_store_ps( scratch , dSum );
+				dotSum = scratch[3];
+				s = sRestrict-_start/2;
+#endif // FIX_RESTRICTION
+			}
+			if( eRestrict==major/2 && periodicType==NO_PERIODIC ) e = (eRestrict-_start/2)-2;
+			else                                                  e = (eRestrict-_start/2);
+
+			for( int i=s ; i<e ; i+=2 )                           lB[i] = RestrictionUpdate0( prolongationStencil[1].matrixValues[0] , localRAccum , dotSum , i );
+			int i=(eRestrict-_start/2)-2;
+			if( eRestrict==major/2 && periodicType==NO_PERIODIC ) lB[i] = RestrictionUpdate0( prolongationStencil[2].matrixValues[0] , localRAccum , dotSum , i );
+		}
+		// Offset 1
+		{
+			if( sRestrict==0 && periodicType==NO_PERIODIC )
+			{
+				SetRestrictionDotSum( prolongationStencil[0].matrixValues[1] , localRAccum , 0 , dSum );
+				s=1;
+			}
+			else
+			{
+#ifdef FIX_RESTRICTION
+				// Get the next even
+				int _sRestrict = (sRestrict&1) ? sRestrict : sRestrict+1;
+				SetRestrictionDotSum( prolongationStencil[1].matrixValues[1] , localRAccum , HighStart128( _sRestrict ) , dSum );
+				s = _sRestrict - _start/2;
+#else // !FIX_RESTRICTION
+				SetRestrictionDotSum( prolongationStencil[1].matrixValues[1] , localRAccum , highStart128+1 , dSum );
+				s = (sRestrict-_start/2)+1;
+#endif // FIX_RESTRICTION
+			}
+			_mm_store_ps( scratch , dSum );
+			dotSum = scratch[1]+scratch[2]+scratch[3];
+			if( eRestrict==major/2 && periodicType==NO_PERIODIC ) e = (eRestrict-_start/2)-4;
+			else                                                  e = (eRestrict-_start/2);
+			for( int i=s ; i<e ; i+=2 ) lB[i] = RestrictionUpdate1( prolongationStencil[1].matrixValues[1] , localRAccum , dotSum , i );
+			if( eRestrict==major/2 && periodicType==NO_PERIODIC )
+			{
+				int i=(eRestrict-_start/2)-3;
+				lB[i] = RestrictionUpdate1(prolongationStencil[2].matrixValues[1],localRAccum,dotSum,i);
+				i+=2;
+				lB[i] = dotSum;
 			}
 		}
 	}
 }
+#ifdef FIX_RESTRICTION
+#else // !FIX_RESTRICTION
 template< int Channels , class StorageType , class SyncType >
 void SocketedMultiGridStreamingSolver< Channels , StorageType , SyncType >::SetInteriorRestriction( Pointer( float ) lB , int c , int idx , int sRestrict , int eRestrict )
 {
@@ -2513,7 +2586,7 @@ void SocketedMultiGridStreamingSolver< Channels , StorageType , SyncType >::SetI
 		}
 	}
 }
-
+#endif // FIX_RESTRICTION
 template< int Channels , class StorageType , class SyncType >
 bool SocketedMultiGridStreamingSolver< Channels , StorageType , SyncType >::IterateRestriction( void )
 {

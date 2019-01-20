@@ -8,6 +8,7 @@
 
 #define SAME_SIZE_BUFFERS 1
 #define MISHA_DENORMAL_CONTROL 1
+#define FIX_RESTRICTION
 
 
 enum
@@ -250,7 +251,10 @@ public:
 	void SolveProlongation	( void );
 	void SolveRestriction	( void );
 	void SetRestriction			( Pointer( float ) lowB , int c , int idx , int sRestrict , int eRestrict );
+#ifdef FIX_RESTRICTION
+#else // !FIX_RESTRICTION
 	void SetInteriorRestriction ( Pointer( float ) lowB , int c , int idx , int sRestrict , int eRestrict );
+#endif // FIX_RESTRICTION
 	void SetProlongation		( Pointer( float ) highX , int c , int highIdx , int highStart , int highSize , int highMajor , int highMinor );
 };
 

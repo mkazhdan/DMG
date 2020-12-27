@@ -28,6 +28,8 @@ DAMAGE.
 #ifndef XPLATFORM_INCLUDED
 #define XPLATFORM_INCLUDED
 
+#define NEW_CODE
+
 #define DEBUG_MUTEX 1
 
 #ifdef _WIN32

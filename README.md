@@ -1,4 +1,4 @@
-<CENTER><H1>Distributed Gradient-Domain Processing of Planar and Spherical Images</H1></CENTER>
+<CENTER><H1>Distributed Gradient-Domain Processing of Planar and Spherical Images (Version 4.52)</H1></CENTER>
 <CENTER>
 <A HREF="#LINKS">links</A>
 <A HREF="#DESCRIPTION">description</A>
@@ -13,8 +13,10 @@
 <A href="http://www.cs.jhu.edu/~misha/Streaming2DMultiGrid/StJames/15/StJames.html">St James Visualization</A><BR>
 -->
 <A href="http://www.cs.jhu.edu/~misha/Code/DMG/DMG.exe.zip">Windows (x64) Executables</A><br>
-<A href="http://www.cs.jhu.edu/~misha/Code/DMG/DMG.zip">Source Code</A><br>
+<A href="http://www.cs.jhu.edu/~misha/Code/DMG/DMG.zip">Source Code</A><br> <A HREF="https://github.com/mkazhdan/DMG">GitHub Repository</A><BR>
 (Older Versions:
+<A href="http://www.cs.jhu.edu/~misha/Code/DMG/Version4.5/">Version 4.51 Page</A>
+<A href="http://www.cs.jhu.edu/~misha/Code/DMG/Version4.5/">Version 4.5 Page</A>
 <A href="http://www.cs.jhu.edu/~misha/Code/DMG/Version4.1/">Version 4.1 Page</A>
 <A href="http://www.cs.jhu.edu/~misha/Code/DMG/Version4/">Version 4 Page</A>
 <A href="http://www.cs.jhu.edu/~misha/Code/DMG/Version3.5/">Version 3.5 Page</A>
@@ -95,7 +97,7 @@ The code also requires installation of the <i>zlib</i>, <i>png</i>, <i>tiff</i>,
 <DT>[<B>--tileWidth</B> &#60;<i>iGrid tile width</i>&#62;]
 <DT>[<B>--tileHeight</B> &#60;<i>iGrid tile height</i>&#62;]
 <DT>[<B>--tileExt</B> &#60;<i>iGrid tile extnsion</i>&#62;]
-<DD> When outputting to a tiled grid of images in <A HREF="http://htmlpreview.github.io/?https://github.com/mkazhdan/DMG/blob/master/iGrid.html">iGrid</A> format, these parameters specify the width, height, and file-type for the output tiles. The default resolution for the output tiles is 8192x8192 and the default file type is JPG.
+<DD> When outputting to a tiled grid of images in <A HREF="iGrid.html">iGrid</A> format, these parameters specify the width, height, and file-type for the output tiles. The default resolution for the output tiles is 8192x8192 and the default file type is JPG.
 
 <DT>[<B>--iWeight</B> &#60;<i>pixel fidelity term</i>&#62;]
 <DD> If the system is solving the Poisson equation to perform image smoothing or sharpening, this value specifies the fidelity term &alpha;.
@@ -112,10 +114,10 @@ The code also requires installation of the <i>zlib</i>, <i>png</i>, <i>tiff</i>,
 <DL>
 
 <DT><b>--pixels</b> &#60;<i>input composite/high-frequency image</i>&#62;
-<DD> This string is the the name of the image file containing the image band that this client is responsible for. (Currently supported file-types include PNG, JPEG, BMP, WDP, TIFF, and our tiled image format <A HREF="http://htmlpreview.github.io/?https://github.com/mkazhdan/DMG/blob/master/iGrid.html">iGrid</A>.) The image height is unconstrained (though it must be the same across all clients). However, the width for all but the last band should be a multiple of a nice-power of two. (Roughly, the power should be equal to the number of levels over which the solver is parallelized.)
+<DD> This string is the the name of the image file containing the image band that this client is responsible for. (Currently supported file-types include PNG, JPEG, BMP, WDP, TIFF, and our tiled image format <A HREF="iGrid.html">iGrid</A>.) The image height is unconstrained (though it must be the same across all clients). However, the width for all but the last band should be a multiple of a nice-power of two. (Roughly, the power should be equal to the number of levels over which the solver is parallelized.)
 
 <DT><b>--lowPixels</b> &#60;<i>input low-frequency image</i>&#62;
-<DD> This string is the the name of the image file containing the low-frequency image band that this client is responsible for. (Currently supported file-types include PNG, JPEG, BMP, WDP, TIFF, and our tiled image format <A HREF="http://htmlpreview.github.io/?https://github.com/mkazhdan/DMG/blob/master/iGrid.html">iGrid</A>.) The image height is unconstrained (though it must be the same across all clients). However, the width for all but the last band should be a multiple of a nice-power of two. (Roughly, the power should be equal to the number of levels over which the solver is parallelized.) If this file is not specified, the argument to <b>--pixels</B> is used for both low- and high-frequency content.
+<DD> This string is the the name of the image file containing the low-frequency image band that this client is responsible for. (Currently supported file-types include PNG, JPEG, BMP, WDP, TIFF, and our tiled image format <A HREF="iGrid.html">iGrid</A>.) The image height is unconstrained (though it must be the same across all clients). However, the width for all but the last band should be a multiple of a nice-power of two. (Roughly, the power should be equal to the number of levels over which the solver is parallelized.) If this file is not specified, the argument to <b>--pixels</B> is used for both low- and high-frequency content.
 
 
 <DT><b>--labels</b> &#60;<i>input mask image</i>&#62;
@@ -149,18 +151,18 @@ This parameter is required when performing stiching, as it lets the system know 
 <A NAME="USAGE"><B>USAGE</B></A><br>
 For testing purposes, two sample datasets are provided.
 <UL>
-<LI> <A HREF="PNC3/PNC3.zip">PNC3</A>: This dataset, courtesty of Matt Uyttendaele, consists of a panorama of 7 images resulting in an image of resolution 7,963 x 3,589.<BR>
+<LI> <A HREF="../PNC3/PNC3.zip">PNC3</A>: This dataset, courtesty of Matt Uyttendaele, consists of a panorama of 7 images resulting in an image of resolution 7,963 x 3,589.<BR>
 For distributed processing, the image and the mask are broken up into two roughly uniform-sized bands,  shown below.<BR>
 <TABLE BORDER=2>
 <TR>
 <TH>Composite
-<TD><IMG SRC="PNC3/pixels.0.tn.jpg" height=300></TD>
-<TD><IMG SRC="PNC3/pixels.1.tn.jpg" height=300></TD>
+<TD><IMG SRC="../PNC3/pixels.0.tn.jpg" height=300></TD>
+<TD><IMG SRC="../PNC3/pixels.1.tn.jpg" height=300></TD>
 </TR>
 <TR>
 <TH>Mask
-<TD><IMG SRC="PNC3/labels.0.tn.jpg" height=300></TD>
-<TD><IMG SRC="PNC3/labels.1.tn.jpg" height=300></TD>
+<TD><IMG SRC="../PNC3/labels.0.tn.jpg" height=300></TD>
+<TD><IMG SRC="../PNC3/labels.1.tn.jpg" height=300></TD>
 </TR>
 <TR>
 <TH>
@@ -187,15 +189,15 @@ ClientSocket.exe --pixels pixels.1.png --labels labels.1.png --out out.1.jpeg --
 The resulting, stitched, image bands are:<BR>
 <TABLE BORDER=2>
 <TR>
-<TD><IMG SRC="PNC3/out.0.tn.jpg" height=400>
-<TD><IMG SRC="PNC3/out.1.tn.jpg" height=400>
+<TD><IMG SRC="../PNC3/out.0.tn.jpg" height=400>
+<TD><IMG SRC="../PNC3/out.1.tn.jpg" height=400>
 </TR>
 <TR>
 <TH> Process 0 Output
 <TH> Process 1 Output
 </TR>
 </TABLE>
-Alternatively, if we just want to run on a single machine, we set up the server to expect a single connection, and use the <A href="http://htmlpreview.github.io/?https://github.com/mkazhdan/DMG/blob/master/iGrid.html">iGrid</A> format to merge the data:
+Alternatively, if we just want to run on a single machine, we set up the server to expect a single connection, and use the <A href="iGrid.html">iGrid</A> format to merge the data:
 <BLOCKQUOTE><CODE>
 ServerSocket.exe --count 1 --port 12345<br>
 ClientSocket.exe --pixels pixels.iGrid --labels labels.iGrid --out out.jpeg --address 127.0.0.1 --port 12345 --threads 3 --inCore
@@ -203,39 +205,39 @@ ClientSocket.exe --pixels pixels.iGrid --labels labels.iGrid --out out.jpeg --ad
 The resulting, stitched, image is:<BR>
 <TABLE BORDER=2>
 <TR>
-<TD><IMG SRC="PNC3/out.tn.jpg" height=400>
+<TD><IMG SRC="../PNC3/out.tn.jpg" height=400>
 </TR>
 <TR>
 <TH> Process 0 Output
 </TR>
 </TABLE>
 
-<LI> <A HREF="Edinburgh/Edinburgh.zip">Edinburgh</A>: This dataset, courtesty of Brian Curless, consists of a panorama of 25 images resulting in an image of resolution 16,950 x 2,956
+<LI> <A HREF="../Edinburgh/Edinburgh.zip">Edinburgh</A>: This dataset, courtesty of Brian Curless, consists of a panorama of 25 images resulting in an image of resolution 16,950 x 2,956
 For distributed processing, the image and the mask are broken up into 9 blocks of width 2048, shown below.<BR>
 <TABLE BORDER=2>
 <TR>
 <TH>Composite
-<TD><IMG SRC="Edinburgh/pixels.0.0.tn.jpg" height=250></TD>
-<TD><IMG SRC="Edinburgh/pixels.1.0.tn.jpg" height=250></TD>
-<TD><IMG SRC="Edinburgh/pixels.2.0.tn.jpg" height=250></TD>
-<TD><IMG SRC="Edinburgh/pixels.3.0.tn.jpg" height=250></TD>
-<TD><IMG SRC="Edinburgh/pixels.4.0.tn.jpg" height=250></TD>
-<TD><IMG SRC="Edinburgh/pixels.5.0.tn.jpg" height=250></TD>
-<TD><IMG SRC="Edinburgh/pixels.6.0.tn.jpg" height=250></TD>
-<TD><IMG SRC="Edinburgh/pixels.7.0.tn.jpg" height=250></TD>
-<TD><IMG SRC="Edinburgh/pixels.8.0.tn.jpg" height=250></TD>
+<TD><IMG SRC="../Edinburgh/pixels.0.0.tn.jpg" height=250></TD>
+<TD><IMG SRC="../Edinburgh/pixels.1.0.tn.jpg" height=250></TD>
+<TD><IMG SRC="../Edinburgh/pixels.2.0.tn.jpg" height=250></TD>
+<TD><IMG SRC="../Edinburgh/pixels.3.0.tn.jpg" height=250></TD>
+<TD><IMG SRC="../Edinburgh/pixels.4.0.tn.jpg" height=250></TD>
+<TD><IMG SRC="../Edinburgh/pixels.5.0.tn.jpg" height=250></TD>
+<TD><IMG SRC="../Edinburgh/pixels.6.0.tn.jpg" height=250></TD>
+<TD><IMG SRC="../Edinburgh/pixels.7.0.tn.jpg" height=250></TD>
+<TD><IMG SRC="../Edinburgh/pixels.8.0.tn.jpg" height=250></TD>
 </TR>
 <TR>
 <TH>Mask
-<TD><IMG SRC="Edinburgh/labels.0.0.tn.jpg" height=250></TD>
-<TD><IMG SRC="Edinburgh/labels.1.0.tn.jpg" height=250></TD>
-<TD><IMG SRC="Edinburgh/labels.2.0.tn.jpg" height=250></TD>
-<TD><IMG SRC="Edinburgh/labels.3.0.tn.jpg" height=250></TD>
-<TD><IMG SRC="Edinburgh/labels.4.0.tn.jpg" height=250></TD>
-<TD><IMG SRC="Edinburgh/labels.5.0.tn.jpg" height=250></TD>
-<TD><IMG SRC="Edinburgh/labels.6.0.tn.jpg" height=250></TD>
-<TD><IMG SRC="Edinburgh/labels.7.0.tn.jpg" height=250></TD>
-<TD><IMG SRC="Edinburgh/labels.8.0.tn.jpg" height=250></TD>
+<TD><IMG SRC="../Edinburgh/labels.0.0.tn.jpg" height=250></TD>
+<TD><IMG SRC="../Edinburgh/labels.1.0.tn.jpg" height=250></TD>
+<TD><IMG SRC="../Edinburgh/labels.2.0.tn.jpg" height=250></TD>
+<TD><IMG SRC="../Edinburgh/labels.3.0.tn.jpg" height=250></TD>
+<TD><IMG SRC="../Edinburgh/labels.4.0.tn.jpg" height=250></TD>
+<TD><IMG SRC="../Edinburgh/labels.5.0.tn.jpg" height=250></TD>
+<TD><IMG SRC="../Edinburgh/labels.6.0.tn.jpg" height=250></TD>
+<TD><IMG SRC="../Edinburgh/labels.7.0.tn.jpg" height=250></TD>
+<TD><IMG SRC="../Edinburgh/labels.8.0.tn.jpg" height=250></TD>
 </TR>
 <TR>
 <TH>
@@ -255,10 +257,10 @@ ClientSocket.exe --address 123.456.789.101:11213 --index 1 --pixels pixels.1.iGr
 The resulting, stitched, image bands are:<BR>
 <TABLE BORDER=2>
 <TR>
-<TD><IMG SRC="Edinburgh/out.0.0.0.tn.jpg" height=300>
-<TD><IMG SRC="Edinburgh/out.0.1.0.tn.jpg" height=300>
-<TD><IMG SRC="Edinburgh/out.1.0.0.tn.jpg" height=300>
-<TD><IMG SRC="Edinburgh/out.1.1.0.tn.jpg" height=300>
+<TD><IMG SRC="../Edinburgh/out.0.0.0.tn.jpg" height=300>
+<TD><IMG SRC="../Edinburgh/out.0.1.0.tn.jpg" height=300>
+<TD><IMG SRC="../Edinburgh/out.1.0.0.tn.jpg" height=300>
+<TD><IMG SRC="../Edinburgh/out.1.1.0.tn.jpg" height=300>
 </TR>
 <TR>
 <TH COLSPAN=2> Process 0 Output
@@ -281,16 +283,16 @@ ClientSocket.exe --address 123.456.789.101:11213 --index 1 --pixels out.1.iGrid 
 The smoothed and sharpened image bands are:<BR>
 <TABLE BORDER=2>
 <TR>
-<TD><IMG SRC="Edinburgh/smooth.0.0.0.tn.jpg" height=300>
-<TD><IMG SRC="Edinburgh/smooth.0.1.0.tn.jpg" height=300>
-<TD><IMG SRC="Edinburgh/smooth.1.0.0.tn.jpg" height=300>
-<TD><IMG SRC="Edinburgh/smooth.1.1.0.tn.jpg" height=300>
+<TD><IMG SRC="../Edinburgh/smooth.0.0.0.tn.jpg" height=300>
+<TD><IMG SRC="../Edinburgh/smooth.0.1.0.tn.jpg" height=300>
+<TD><IMG SRC="../Edinburgh/smooth.1.0.0.tn.jpg" height=300>
+<TD><IMG SRC="../Edinburgh/smooth.1.1.0.tn.jpg" height=300>
 </TR>
 <TR>
-<TD><IMG SRC="Edinburgh/sharpen.0.0.0.tn.jpg" height=300>
-<TD><IMG SRC="Edinburgh/sharpen.0.1.0.tn.jpg" height=300>
-<TD><IMG SRC="Edinburgh/sharpen.1.0.0.tn.jpg" height=300>
-<TD><IMG SRC="Edinburgh/sharpen.1.1.0.tn.jpg" height=300>
+<TD><IMG SRC="../Edinburgh/sharpen.0.0.0.tn.jpg" height=300>
+<TD><IMG SRC="../Edinburgh/sharpen.0.1.0.tn.jpg" height=300>
+<TD><IMG SRC="../Edinburgh/sharpen.1.0.0.tn.jpg" height=300>
+<TD><IMG SRC="../Edinburgh/sharpen.1.1.0.tn.jpg" height=300>
 </TR>
 <TR>
 <TH COLSPAN=2> Process 0 Output
@@ -332,22 +334,32 @@ Note that the fidelity weight, <I>--iWeight 0.005</I>, was chosen so that the sm
 <LI> Removed a dead-lock opportunity that could cause the code lock up right before termination.
 </OL>
 
-<A HREF="http://www.cs.jhu.edu/~misha/Code/DMG/Version3.5/">Version 4</A>:
+<A HREF="http://www.cs.jhu.edu/~misha/Code/DMG/Version4/">Version 4</A>:
 <OL>
 <LI> General code clean-up.
 <LI> Improved support for single-channel images.
 </OL>
 
-<A HREF="http://www.cs.jhu.edu/~misha/Code/DMG/Version3.5/">Version 4.1</A>:
+<A HREF="http://www.cs.jhu.edu/~misha/Code/DMG/Version4.1/">Version 4.1</A>:
 <OL>
 <LI> Fixed int to float casting bug.
 <LI> Fixed HDR I/O bug.
 </OL>
 
-<A HREF="http://www.cs.jhu.edu/~misha/Code/DMG/Version3.5/">Version 4.5</A>:
+<A HREF="http://www.cs.jhu.edu/~misha/Code/DMG/Version4.5/">Version 4.5</A>:
 <OL>
-<LI> Fixed bad memory access when no labels are provied
+<LI> Fixed bad memory access when no labels are provided
 <LI> Fixed missing scaling when threads are forced to merge
+</OL>
+
+<A HREF="http://www.cs.jhu.edu/~misha/Code/DMG/Version4.51/">Version 4.51</A>:
+<OL>
+<LI> Cleaned up indexing problem in the restriction phase when lane size is odd.
+</OL>
+
+<A HREF="http://www.cs.jhu.edu/~misha/Code/DMG/Version4.52/">Version 4.52</A>:
+<OL>
+<LI> Made minor changes to support compilation under clang.
 </OL>
 
 <HR>

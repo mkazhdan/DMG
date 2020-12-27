@@ -1146,9 +1146,17 @@ bool SocketedMultigridServer< PixelChannels , LabelChannels , SyncType >::SetUp(
 											   bool removeAverageGradient , int unknownType , bool showProgress , bool noCG , bool shortSync , int* clipDimensions )
 {
 	// Create a listening Socket for connecting to server
+#ifdef NEW_CODE
+	AcceptorSocket listenSocket = _INVALID_ACCEPTOR_SOCKET_;
+#else // !NEW_CODE
 	Socket listenSocket = _INVALID_SOCKET_;
+#endif // NEW_CODE
 	listenSocket = GetListenSocket( port );
+#ifdef NEW_CODE
+	if( listenSocket == _INVALID_ACCEPTOR_SOCKET_ ) return false;
+#else // !NEW_CODE
 	if( listenSocket == _INVALID_SOCKET_ ) return false;
+#endif // NEW_CODE
 	if( address )
 	{
 		printf( "Server Address: %s:%d\n", address , port ) , fflush( stdout );
@@ -1692,7 +1700,11 @@ void SocketedMultigridServer< PixelChannels , LabelChannels , SyncType >::Run( v
 			for( int i=0 ; i<PixelChannels*gWidth2 ; i++ ) row[i] = SyncType( upX[ gWidth2*j*PixelChannels+i ] );
 			outX->advance();
 		}
+#ifdef NEW_CODE
+		delete[] upX;
+#else // !NEW_CODE
 		delete upX;
+#endif // NEW_CODE
 
 #if DEBUG_SOCKETS
 		testCommunication( "Receiving solver info" );

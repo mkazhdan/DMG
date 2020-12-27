@@ -95,12 +95,12 @@ private:
 	void SyncSolverTail( int idx , bool read );
 	void SyncResidualHead( int idx , bool read , bool syncPeriodic );
 	void SyncResidualTail( int idx , bool read , bool syncPeriodic );
-	void Solve			( int idx , int c , int sSolve , int eSolve );
-	void SolveInterior	( int idx , int c , int sSolve , int eSolve );
-	void SolveReverse			( int idx , int c , int sSolve , int eSolve );
-	void SolveInteriorReverse	( int idx , int c , int sSolve , int eSolve );
-	void SetResidual			(int idx,int c,int sSolve,int eSolve);
-	void SetInteriorResidual	(int idx,int c,int sSolve,int eSolve);
+	void Solve        ( int idx , int c , int sSolve , int eSolve );
+	void SolveInterior( int idx , int c , int sSolve , int eSolve );
+	void SolveReverse        ( int idx , int c , int sSolve , int eSolve );
+	void SolveInteriorReverse( int idx , int c , int sSolve , int eSolve );
+	void SetResidual        ( int idx , int c , int sSolve , int eSolve );
+	void SetInteriorResidual( int idx , int c , int sSolve , int eSolve );
 protected:
 	bool _deleteServer;
 	MultiStreamIOServer *_server;

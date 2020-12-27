@@ -332,7 +332,11 @@ void SocketedStreamingSolver< Channels , SyncType >::Init( const MatrixStencil& 
 			}
 }
 template< int Channels , class SyncType >
+#ifdef NEW_CODE
+void SocketedStreamingSolver< Channels , SyncType >::Set( int rSize ){ Set( -OffsetX(0) , 0 , 0 , 0 , 0 , rSize ); }
+#else // !NEW_CODE
 void SocketedStreamingSolver< Channels , SyncType >::Set( int rSize ){ Set( -OffsetX , 0 , 0 , 0 , 0 , rSize ); }
+#endif // NEW_CODE
 template< int Channels , class SyncType >
 void SocketedStreamingSolver< Channels , SyncType >::Set( int start , int bStart , int xStart , int bEnd , int xEnd , int rSize )
 {
@@ -1056,6 +1060,9 @@ void SocketedStreamingSolver< Channels , SyncType >::SolveInterior( int j , int 
 template< int Channels , class SyncType >
 void SocketedStreamingSolver< Channels , SyncType >::Solve( int j , int c , int sSolve , int eSolve )
 {
+#ifdef FIX_RESTRICTION
+	if( sSolve%4 ) printf( "Expected sSolve to be a multiple of four: %d\n" , sSolve ) , exit( 0 );
+#endif // FIX_RESTRICTION
 	int jj;
 	if      ( j<Degree        ) jj=j;
 	else if	( j>minor-1-Degree) jj=2*Degree+(j-(minor-1));
@@ -1363,6 +1370,9 @@ void SocketedStreamingSolver< Channels , SyncType >::SolveInteriorReverse( int j
 template< int Channels , class SyncType >
 void SocketedStreamingSolver< Channels , SyncType >::SolveReverse( int j , int c , int sSolve , int eSolve )
 {
+#ifdef FIX_RESTRICTION
+	if( eSolve%4!=0 ) printf( "Expected eSolve to be a multiple of four: %d\n" , eSolve ) , exit( 0 );
+#endif // FIX_RESTRICTION
 	int jj;
 	if		(j<Degree)			jj=j;
 	else if	(j>minor-1-Degree)	jj=2*Degree+(j-(minor-1));
@@ -1685,6 +1695,9 @@ void SocketedStreamingSolver< Channels , SyncType >::SetInteriorResidual(int j,i
 template< int Channels , class SyncType >
 void SocketedStreamingSolver< Channels , SyncType >::SetResidual( int j , int c , int sSolve , int eSolve )
 {
+#ifdef FIX_RESTRICTION
+	if( sSolve%4 ) printf( "Expected sSolve to be a multiple of four: %d\n" , sSolve ) , exit( 0 );
+#endif // FIX_RESTRICTION
 	int jj;
 	if		(j<Degree)			jj=j;
 	else if	(j>minor-1-Degree)	jj=2*Degree+(j-(minor-1));
@@ -1696,7 +1709,7 @@ void SocketedStreamingSolver< Channels , SyncType >::SetResidual( int j , int c 
 		if(eSolve>major)	eSolve=major;
 	}
 	if( jj==Degree || periodicType==SPHERICAL_PERIODIC ) return SetInteriorResidual( j , c , sSolve , eSolve );
-	jj*=3;
+	jj *= 3;
 
 	{
 		ConstPointer( float ) localXPtrs[2*Degree+1];
@@ -1717,7 +1730,7 @@ void SocketedStreamingSolver< Channels , SyncType >::SetResidual( int j , int c 
 			( ConstPointer( __m128 ) )localXPtrs[3],
 			( ConstPointer( __m128 ) )localXPtrs[4]
 		};
-		int s,e;
+		int s , e;
 		// Offset 0
 		{
 			__m128 mValues[]=
@@ -1730,22 +1743,22 @@ void SocketedStreamingSolver< Channels , SyncType >::SetResidual( int j , int c 
 			};
 			if( sSolve==0 && periodicType==NO_PERIODIC )
 			{
-				dotSum=0;
-				localRPtr[0]=localBPtr[0]-GetLaplacianValue0(lapTemplates[jj].matrixValues[0],xPtrs,dotSum,0);
-				s=4;
+				dotSum = 0;
+				localRPtr[0] = localBPtr[0]-GetLaplacianValue0( lapTemplates[jj].matrixValues[0] , xPtrs , dotSum , 0 );
+				s = 4;
 			}
 			else
 			{
-				SetDotSum(mValues,xPtrs,-1+((sSolve-_start)>>2),dSum);
-				s=sSolve-_start;
-				_mm_store_ps(scratch,dSum);
-				dotSum=scratch[2]+scratch[3];
+				SetDotSum( mValues , xPtrs , -1+((sSolve-_start)>>2) , dSum );
+				s = sSolve-_start;
+				_mm_store_ps( scratch , dSum );
+				dotSum = scratch[2]+scratch[3];
 			}
-			if( eSolve==major && periodicType==NO_PERIODIC)	e=eSolve-_start-4;
-			else							e=eSolve-_start;
-			for(int i=s;i<e;i+=4)			localRPtr[i]=localBPtr[i]-GetLaplacianValue0(mValues,xPtrs,dotSum,i);
-			int i=eSolve-_start-4;
-			if( eSolve==major && periodicType==NO_PERIODIC )	localRPtr[i]=localBPtr[i]-GetLaplacianValue0(lapTemplates[jj+2].matrixValues[0],xPtrs,dotSum,i);
+			if( eSolve==major && periodicType==NO_PERIODIC ) e = eSolve-_start-4;
+			else                                             e = eSolve-_start;
+			for( int i=s ; i<e ; i+=4 )                      localRPtr[i] = localBPtr[i]-GetLaplacianValue0( mValues , xPtrs , dotSum , i );
+			int i = eSolve-_start-4;
+			if( eSolve==major && periodicType==NO_PERIODIC ) localRPtr[i] = localBPtr[i]-GetLaplacianValue0( lapTemplates[jj+2].matrixValues[0] , xPtrs , dotSum , i );
 		}
 		// Offset 1
 		{
@@ -3487,6 +3500,9 @@ void SocketedStreamingDivergence< PixelChannels , LabelChannels , PixelType , La
 template< int PixelChannels , int LabelChannels , class PixelType , class LabelType , class StorageType , class SyncType >
 void SocketedStreamingDivergence< PixelChannels , LabelChannels , PixelType , LabelType , StorageType , SyncType >::SetRestriction( Pointer( float ) lB , int c , int idx , int sRestrict , int eRestrict )
 {
+#ifdef FIX_RESTRICTION
+	if( sRestrict%4 ) printf( "Expected sRestrict to be a multiple of four: %d\n" , sRestrict ) , exit( 0 );
+#endif // FIX_RESTRICTION
 	if( _periodicType==NO_PERIODIC )
 	{
 		if( sRestrict<0     ) sRestrict = 0;

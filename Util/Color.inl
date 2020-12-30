@@ -26,7 +26,7 @@ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF S
 DAMAGE.
 */
 template< class Real , int Channels > Color< Real , Channels >::Color( void ){ memset( c , 0 , sizeof( Real ) * Channels ); }
-template< class Real , int Channels > Color< Real , Channels >::Color( Real clr ){ c[0] = c[1] = c[2] = clr; }
+template< class Real , int Channels > Color< Real , Channels >::Color( Real clr ){ for( int i=0 ; i<Channels ; i++ ) c[i] = clr; }
 template< class Real , int Channels > Color< Real , Channels >::Color( const Real* clr ){ memcpy( c , clr , sizeof(Real)*Channels ); }
 
 //template< class Real , int Channels > Color< Real , Channels >::Color(Real c0,Real c1,Real c2)	{ c[0]=c0;	c[1]=c1;	c[2]=c2; }

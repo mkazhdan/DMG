@@ -1,4 +1,4 @@
-<CENTER><H1>Distributed Gradient-Domain Processing of Planar and Spherical Images (Version 4.52)</H1></CENTER>
+<CENTER><H1>Distributed Gradient-Domain Processing of Planar and Spherical Images (Version 4.53)</H1></CENTER>
 <CENTER>
 <A HREF="#LINKS">links</A>
 <A HREF="#DESCRIPTION">description</A>
@@ -12,10 +12,11 @@
 <!--
 <A href="http://www.cs.jhu.edu/~misha/Streaming2DMultiGrid/StJames/15/StJames.html">St James Visualization</A><BR>
 -->
-<A href="http://www.cs.jhu.edu/~misha/Code/DMG/DMG.exe.zip">Windows (x64) Executables</A><br>
-<A href="http://www.cs.jhu.edu/~misha/Code/DMG/DMG.zip">Source Code</A><br> <A HREF="https://github.com/mkazhdan/DMG">GitHub Repository</A><BR>
+<A href="http://www.cs.jhu.edu/~misha/Code/DMG/Version4.53/DMG.exe.zip">Windows (x64) Executables</A><br>
+<A href="http://www.cs.jhu.edu/~misha/Code/DMG/Version4.53/DMG.zip">Source Code</A><br> <A HREF="https://github.com/mkazhdan/DMG">GitHub Repository</A><BR>
 (Older Versions:
-<A href="http://www.cs.jhu.edu/~misha/Code/DMG/Version4.5/">Version 4.51 Page</A>
+<A href="http://www.cs.jhu.edu/~misha/Code/DMG/Version4.52/">Version 4.52 Page</A>
+<A href="http://www.cs.jhu.edu/~misha/Code/DMG/Version4.51/">Version 4.51 Page</A>
 <A href="http://www.cs.jhu.edu/~misha/Code/DMG/Version4.5/">Version 4.5 Page</A>
 <A href="http://www.cs.jhu.edu/~misha/Code/DMG/Version4.1/">Version 4.1 Page</A>
 <A href="http://www.cs.jhu.edu/~misha/Code/DMG/Version4/">Version 4 Page</A>
@@ -360,6 +361,11 @@ Note that the fidelity weight, <I>--iWeight 0.005</I>, was chosen so that the sm
 <A HREF="http://www.cs.jhu.edu/~misha/Code/DMG/Version4.52/">Version 4.52</A>:
 <OL>
 <LI> Made minor changes to support compilation under clang.
+</OL>
+
+<A HREF="http://www.cs.jhu.edu/~misha/Code/DMG/Version4.53/">Version 4.53</A>:
+<OL>
+<LI> Added the <I>BigImageProcess</I> code.
 </OL>
 
 <HR>

@@ -56,7 +56,8 @@ bool GetHostEndpointAddress( EndpointAddress* address , const char* prefix )
 	{
 		if( (*iterator).endpoint().address().is_v4() )
 		{
-			const char* _address = (*iterator).endpoint().address().to_string().c_str();
+			std::string str = (*iterator).endpoint().address().to_string();
+			const char* _address = str.c_str();
 			if( !prefix || strstr( _address , prefix ) )
 			{
 				*address = (*iterator).endpoint().address();
